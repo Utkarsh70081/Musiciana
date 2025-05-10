@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Player</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #121212;
+      color: #fff;
+    }
+    section {
+      padding: 20px;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .home-btn {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .category-buttons button,
+    .player-buttons button {
+      margin: 5px;
+      padding: 10px 15px;
+      background-color: #2b21a1;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .category-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+    .song-item {
+      background-color: #282828;
+      padding: 10px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .song-item img {
+      width: 50px;
+      height: 50px;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+    .song-name {
+      flex-grow: 1;
+    }
+    .song-display {
+      text-align: center;
+    }
+    .player-buttons {
+      margin-top: 20px;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #1c1c1c;
+      color: #aaa;
+      font-size: 14px;
+      margin-top: 30px;
+    }
+    .upload-info {
+      margin-top: 10px;
+      color: #ccc;
+      font-size: 14px;
+    }
+    .local-path-info {
+      background-color: #333;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    .local-path-info code {
+      color: #61dafb;
+    }
+    @media (max-width: 768px) {
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .home-btn img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .category-buttons {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .category-buttons button {
+    flex: 1 1 calc(45% - 10px);
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .song-item {
+  background-color: #282828;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.song-item img {
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.song-name {
+  flex: 1 1 auto;
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.song-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.song-controls button {
+  padding: 8px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #2b21a1;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  /* .song-item {
+    flex-direction: column;
+    align-items: flex-start;
+  } */
+  .song-controls {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+
+  .player-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .player-buttons button {
+    flex: 1 1 30%;
+    padding: 10px;
+    font-size: 16px;
+  }
+
+  audio {
+    width: 100%;
+  }
+
+  footer {
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <section id="home">
+    <div class="top-bar">
+      <button class="home-btn"><img id="homeImage" src="/image/Home.png" style="width: 50px; height: 50px;"></button>
+    </div>
+    <div class="category-buttons">
+      <button onclick="loadCategory('GYM')">GYM</button>
+      <button onclick="loadCategory('Travel')">Travel</button>
+      <button onclick="loadCategory('Party')">Item</button>
+      <button onclick="loadCategory('Lofi')">Lofi</button>
+      <button onclick="loadCategory('Old Song')">Old Song</button>
+      <button onclick="loadCategory('Bhajan')">Bhajan</button>
+      <button onclick="loadCategory('Hollywood')">Hollywood</button>
+      <button onclick="loadCategory('Other Lan')">Other Lan</button>
+      <button onclick="loadCategory('Fav')">Fav</button>
+      <button onclick="loadCategory('BGMI')">BGMI</button>
+    </div>
+  </section>
+
+  <section id="songs-list" style="display:none">
+    <div class="top-bar">
+      <button class="home-btn" onclick="showSection('home')"><img id="homeImage" src="/image/Home.png" style="width: 50px; height: 50px;"></button>
+      <h2 id="category-title">Category</h2>
+    </div> 
+    <div id="song-container"></div>
+    <!-- <div class="local-path-info">
+      <strong>To add a song manually:</strong><br>
+      Paste your local song path in the code (example):<br>
+      <code>
+        audio: "file:///C:/Users/YourName/Music/your_song.mp3"
+      </code><br>
+      <small>Note: Local file URLs work only if you open this HTML file directly from your PC.</small>
+    </div> -->
+  </section>
+
+  <section id="song-detail" style="display:none">
+    <div class="top-bar">
+      <button class="home-btn" onclick="showSection('songs-list')"><img id="homeImage" src="/image/left.png" style="width: 50px; height: 50px;"></button>
+      <h2 id="song-title"></h2>
+    </div>
+    <div class="song-display">
+      <img id="song-image" src="" alt="">
+      <audio id="audio-player" controls style="margin-top:20px">
+        <source id="audio-source" src="" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+      <div class="player-buttons">
+        <button onclick="prevSong()">⏮</button>
+        <button onclick="playPause()">⏯</button>
+        <button onclick="nextSong()">⏭</button>
+      </div>
+      <div class="upload-info" id="upload-info"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Music Player App | Designed by <a href="a" style="color:#61dafb; text-decoration: none;" target="_blank">Utkarsh Mishra</a></p>
+  </footer>
+
+  <script>
+    const songs = {
+      GYM: [
+        { name: "GET READY TO FIGHT", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746879081/GET_READY_TO_FIGHT_MP3_160K_dtjxaw.mp3" },
+        { name: "Falak Tu Garaj Tu KGF", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880026/Falak_Tu_Garaj_Tu_KGF_vunyai.mp3" },
+        { name: "Aarambh", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880012/Aarambh_csyk1n.mp3" },
+        { name: "chhatrapati shivaji maharaj", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880028/chhatrapati_shivaji_maharaj_e0wvrs.mp3" },
+        { name: "Deva Shree Ganesha", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880024/Deva_Shree_Ganesha_ybcjfg.mp3" },
+        { name: "Ghamand Kar Song", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880030/Ghamand_Kar_Song_rfs5cb.mp3" },
+        { name: "Hai Katha Sangram Ki", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880030/Hai_Katha_Sangram_Ki_b5oc6i.mp3" },
+        { name: "SHOORVEER Tribute", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880038/SHOORVEER_Tribute_czrmnp.mp3" },
+        { name: "SHREE KRISHN EDIT", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880037/SHREE_KRISHN_EDIT_woqz0m.mp3" },
+
+        
+        { name: "Aura", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880057/Aura_po74z1.mp3" },
+
+        { name: "Ek Din Pyar", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880022/Ek_Din_Pyar_q4zmyo.mp3" },
+        { name: "Victory Anthom", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880038/Victory_Anthom_tvzehn.mp3" },
+        { name: "Rammestein", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880034/Rammestein_jydeuk.mp3" },
+        { name: "After Dark", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880015/After_Dark_yqelqe.mp3" },
+        { name: "Anime", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880032/Anime_ztfohq.mp3" },
+        { name: "Matuska", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880031/Matuska_hhasgz.mp3" },
+        { name: "Bloody Merry", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880027/DAVID_LAID_-_Bloody_Mary___GYM_MOTIVATION_MP3_160K_papty6.mp3" },
+        { name: "Timeless", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746880040/Timeless_pi5wlb.mp3" },
+        
+        
+      ],
+      Travel: [
+      { name: "Ek Din Pyar", img: "https://via.placeholder.com/50", audio: "/AUDIO/Ek Din Pyar.mpeg" },
+      { name: "Tujhe Dekha To", img: "https://via.placeholder.com/50", audio: "/AUDIO/Tujhe Dekha To.mp3" }
+      ], 
+      Party: [
+      { name: "Uyi Amma", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901115/Uyi_Amma_-_Azaad___Aaman_D__Rasha_Thadani__Madhubanti_Bagchi_Amit_Trivedi_Amitabh__Bosco__Abhishek_K_MP3_160K_yaq6xk.mp3" },
+      { name: "Toota Jo Kabhi Tara", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901113/Toota_Jo_Kabhi_Tara_-_Tiger_Shroff__Jacqueline___Sumedha_K___Sachin_Jigar_MP3_160K_wkbnxj.mp3" },
+      { name: "Ghungroo", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901111/Ghungroo_Song___WAR___Hrithik_Roshan__Vaani_Kapoor___Arijit_Singh__Shilpa___Vishal___Shekhar__Kumaar_MP3_160K_hc7lac.mp3" },
+      { name: "Aaj Ki Raat", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901095/Aaj_Ki_Raat_-Full_Song__Stree_2_Tamannaah_Bhatia_Rajkummar_Rao_Sachin-Jigar_Madhubanti_Divya_Amitabh_MP3_160K_lq8afk.mp3" },
+      { name: "Akhiyaan Gulaab", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901093/Akhiyaan_Gulaab_Song___Shahid_Kapoor__Kriti_Sanon___Mitraz___Teri_Baaton_Mein_Aisa_Uljha_Jiya_MP3_160K_qepdyc.mp3" },
+      { name: "Aasa Koda", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901109/Sai_Abhyankkar_-_Aasa_Kooda_Music_Video___Thejo_Bharathwaj___Preity_Mukundhan___Sai_Smriti_MP3_160K_kpq6x9.mp3" },
+      { name: "Tum Tum", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901108/Tum_Tum_-_Lyric_Video___Enemy_Tamil___Vishal_Arya___Anand_Shankar___Vinod_Kumar___Thaman_S_MP3_160K_oin1w8.mp3" },
+      { name: "Psyco Saiyaan", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901105/Psycho_Saiyaan___Saaho___Prabhas__Shraddha_Kapoor___Tanishk_Bagchi__Dhvani_Bhanushali__Sachet_Tandon_MP3_160K_aqnfmd.mp3" },
+      { name: "Manali Trance", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901105/Manali_Trance___Yo_Yo_Honey_Singh___Neha_Kakkar___The_Shaukeens___Lisa_Haydon___Akshay_Kumar_MP3_160K_yjwju8.mp3" },
+      { name: "Manohari", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901103/Manohari___Baahubali_-_The_Beginning___Prabhas__Rana_Daggubati__Anushka_Shetty__Tamannaah_Bhatia_MP3_160K_v479zn.mp3" },
+      { name: "Akh Lad Jaave", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901103/Full_Video__Akh_Lad_Jaave___Loveyatri___Aayush_S_Warina_H__Badshah__Tanishk_Bagchi_Jubin_N___Asees_K_MP3_160K_vk6wyy.mp3" },
+      { name: "Khoya Hain", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901103/Khoya_Hain_-_Full_Video___Baahubali_-_The_Beginning___Prabhas__Tamannaah___M.M_Kreem__Manoj_M_MP3_160K_g6ten4.mp3" },
+      { name: "Kya Karu", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901100/Kya_Karu_Full_Song_Millind_Gaba_Feat_Ashnoor___Parampara_Tandon___Asli_Gold__Shabby__Bhushan_Kumar_MP3_160K_qa8n9n.mp3" },
+      { name: "Chammak Challo", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901099/Lyrical__Chammak_Challo___Ra_One___ShahRukh_Khan___Kareena_Kapoor_MP3_160K_p5hryx.mp3" },
+      { name: "Chuttamalle", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901093/Full_Video__Chuttamalle_-_Devara___NTR___Janhvi_Kapoor___Anirudh___Shilpa_Rao___Koratala_Siva_MP3_160K_j2rfe4.mp3" },
+      { name: "Pehle Bhi Main", img: "https://via.placeholder.com/50", audio: "https://res.cloudinary.com/dxdjdetad/video/upload/v1746901093/ANIMAL_Pehle_Bhi_Main_Full_Video___Ranbir_Kapoor_Tripti_Dimri__Sandeep_V__Vishal_M_Raj_S__Bhushan_K_MP3_160K_xrukrj.mp3" },
+      ], 
+      Lofi: [], 
+      "Old Song": [], 
+      Bhajan: [], 
+      Hollywood: [], 
+      "Other Lan": [], 
+      Fav: [], 
+      BGMI: []
+    };
+
+    let currentCategory = null;
+    let currentIndex = 0;
+
+    const audioPlayer = document.getElementById('audio-player');
+    audioPlayer.addEventListener('play', updateToggleIcons);
+    audioPlayer.addEventListener('pause', updateToggleIcons);
+    audioPlayer.addEventListener('ended', () => nextSong());
+
+    function showSection(sectionId) {
+      document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
+      document.getElementById(sectionId).style.display = 'block';
+    }
+
+    function loadCategory(category) {
+      currentCategory = category;
+      document.getElementById('category-title').textContent = category;
+      showSection('songs-list');
+      const container = document.getElementById('song-container');
+      container.innerHTML = '';
+      (songs[category] || []).forEach((song, index) => {
+        const item = document.createElement('div');
+        item.className = 'song-item';
+        item.innerHTML = `
+           
+          <div class="song-name">${song.name}</div>
+          <button class="play-toggle"  onclick="togglePlayPause(event, ${index})" >▶️</button>
+          <button onclick="deleteSong(${index})" style="background:blue; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer;">B</button>
+        `;
+        item.onclick = (event) => {
+          if (event.target.tagName !== 'BUTTON') {
+            currentIndex = index;
+            loadSong(song);
+          }
+        };
+        container.appendChild(item);
+      });
+    }
+
+    function deleteSong(index) {
+      if (confirm('Are you sure you want to delete this song?')) {
+        songs[currentCategory].splice(index, 1);
+        loadCategory(currentCategory);
+      }
+    }
+
+    function loadSong(song) {
+      const currentTime = audioPlayer.currentTime;
+      const isSameSong = document.getElementById('audio-source').src === getFullURL(song.audio);
+      document.getElementById('song-title').textContent = song.name;
+      document.getElementById('song-image').src = song.img;
+      document.getElementById('audio-source').src = song.audio;
+      if (!isSameSong) {
+        audioPlayer.load();
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+      } else {
+        setTimeout(() => {
+          audioPlayer.currentTime = currentTime;
+          showSection('song-detail');
+        }, 50);
+      }
+      document.getElementById('upload-info').textContent = '';
+      showSection('song-detail');
+    }
+
+    function playPause() {
+  if (audioPlayer.paused) {
+    audioPlayer.play();
+  } else {
+    audioPlayer.pause();
+  }
+}
+
+    function prevSong() {
+      if (!currentCategory) return;
+      currentIndex = (currentIndex - 1 + songs[currentCategory].length) % songs[currentCategory].length;
+      loadSong(songs[currentCategory][currentIndex]);
+    }
+
+    function nextSong() {
+      if (!currentCategory) return;
+      currentIndex = (currentIndex + 1) % songs[currentCategory].length;
+      loadSong(songs[currentCategory][currentIndex]);
+    }
+
+    function togglePlayPause(event, index) {
+  event.stopPropagation();
+  const song = songs[currentCategory][index];
+  const isSameSong = audioPlayer.src === getFullURL(song.audio);
+
+  if (!isSameSong) {
+    currentIndex = index;
+    loadSong(song);  // This ensures song-detail view and correct icons
+    updateToggleButtons(index, true); 
+  } else {
+    if (audioPlayer.paused) {
+      audioPlayer.play(); 
+      updateToggleButtons(index, true);
+    } else {
+      audioPlayer.pause();
+      updateToggleButtons(index, false);
+    }
+  }
+}
+
+
+
+    function updateToggleButtons(activeIndex, isPlaying) {
+      document.querySelectorAll('.play-toggle').forEach((btn, i) => {
+        btn.textContent = (i === activeIndex && isPlaying) ? '⏸️' : '▶️';
+      });
+    }
+
+    function updateToggleIcons() {
+  document.querySelectorAll('.play-toggle').forEach((btn, i) => {
+    btn.textContent = (i === currentIndex && !audioPlayer.paused) ? '⏸️' : '▶️';
+  });
+} 
+
+    function getFullURL(path) {
+      const link = document.createElement('a');
+      link.href = path;
+      return link.href;
+    }
+
+    function loadCategory(category) {
+  currentCategory = category;
+  document.getElementById('category-title').textContent = category;
+  showSection('songs-list');
+  const container = document.getElementById('song-container');
+  container.innerHTML = '';
+  (songs[category] || []).forEach((song, index) => {
+    const item = document.createElement('div');
+    item.className = 'song-item';
+    item.innerHTML = `
+      <div class="song-details">
+              <img src="${song.img}" alt="Song">
+              <div class="song-name">${song.name}</div>
+              <div class="song-controls">
+                    <button class="play-toggle" style="margin: 5px;" onclick="togglePlayPause(event, ${index})">▶</button>
+                    <button style="margin: 5px;" onclick="moveSongUp(${index})">⬆</button>
+                    <button style="margin: 5px;" style="background:#2b21a1;" onclick="moveSongDown(${index})">⬇</button>
+                    <button onclick="deleteSong(${index})" style="background:#2b21a1; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer;">🗑️</button>
+              </div>
+      </div>
+  `;
+    item.onclick = (event) => {
+      if (event.target.tagName !== 'BUTTON') {
+        currentIndex = index;
+        loadSong(song);
+      }
+    };
+    container.appendChild(item);
+  });
+}
+
+// Move song up
+function moveSongUp(index) {
+  if (index > 0) {
+    const temp = songs[currentCategory][index];
+    songs[currentCategory][index] = songs[currentCategory][index - 1];
+    songs[currentCategory][index - 1] = temp;
+    loadCategory(currentCategory);
+  }
+}
+
+// Move song down
+function moveSongDown(index) {
+  if (index < songs[currentCategory].length - 1) {
+    const temp = songs[currentCategory][index];
+    songs[currentCategory][index] = songs[currentCategory][index + 1];
+    songs[currentCategory][index + 1] = temp;
+    loadCategory(currentCategory);
+  }
+}
+
+  </script>
+</body>
+</html>
